@@ -59,6 +59,7 @@ jobs:
 
       - name: Start Enigma2
         run: |
+          mkdir -p /dev/input
           export DISPLAY=:0
           export ENIGMA_DEBUG_LVL=5
 
