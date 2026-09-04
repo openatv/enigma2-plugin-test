@@ -57,14 +57,39 @@ jobs:
             cd ../..
           done
 
+      - name: Start Xvfb
+        run: |
+          echo "DISPLAY=:0" >> "$GITHUB_ENV"
+          Xvfb :0 -ac -screen 0 1280x720x24 &
+          sleep 2
+
       - name: Start Enigma2
         run: |
           mkdir -p /dev/input
-          export DISPLAY=:0
           export ENIGMA_DEBUG_LVL=5
 
           echo "Starting Enigma2..."
-          timeout 60s enigma2 > enigma2.log 2>&1 || true
+          enigma2 > enigma2.log 2>&1 &
+          echo $! > enigma2.pid
+
+          sleep 30
+
+      - name: Send MENU Keypress
+        run: |
+          xdotool key Menu
+          sleep 2
+
+      - name: Take Screenshot
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq imagemagick
+          import -window root screenshot.png
+
+      - name: Stop Enigma2
+        if: always()
+        run: |
+          kill "$(cat enigma2.pid)" 2>/dev/null || true
+          sleep 2
 
           echo "==== ENIGMA2 LOG ===="
           cat enigma2.log
@@ -87,3 +112,10 @@ jobs:
             cat /tmp/enigma2_crash.log
             exit 1
           fi
+
+      - name: Upload Screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: enigma2-screenshot
+          path: screenshot.png
