@@ -76,7 +76,14 @@ jobs:
 
       - name: Send MENU Keypress
         run: |
-          xdotool key Menu
+          # Close any startup popup first so it doesn't swallow the menu key.
+          xdotool key Escape
+          sleep 2
+
+          # SDL translates the X11 "Menu" keysym to SDLK_APPLICATION, which
+          # Enigma2's rcsdl.cpp does not handle. KEY_SPACE also triggers the
+          # menu action (see data/keymap.xml) and maps cleanly via SDLK_SPACE.
+          xdotool key space
           sleep 2
 
       - name: Take Screenshot
