@@ -46,7 +46,7 @@ jobs:
 
           cd /tmp
 
-          for repo in 3GModemManager ABMCustomMixImporter AboutBoxBranding AnimationSetup AudioEffect autoBLchanger Blindscan BTDevicesManager ChannelsImporter Chefkoch CleverTanken DLNABrowser DLNAServer EPGTranslator Fempa HbbTV LCD4linux LottoExtended PiconManager PiconsUpdater RemoteChannelStreamConverter SatipClient SimpleFancontrol StreamTV TempFanControl tmdb TunerServer TVSpielfilm VentonFancontrol WebkitHbbTV WirelessAccessPoint witaispeechtotext xmlUpdate ardmediathek bitrateviewer AutoTimer BirthdayReminder BMediaCenter EPGRefresh EPGSearch FritzCall IMDb Netzkino Schiffe SHOUTcast SimpleRSS SRFMediathek Sudoku Tetris vierg WeatherPlugin ZDFMediathek NetworkBrowser AudioSync AutomaticCleanup AutomaticTimerlistCleanup AutoResolution BabelZapper CDInfo EPGBackup EPGExport eSame MPHelp Toolkit AspectRatioSwitch Partnerbox AudioRestart MovieCut fstabEditor FTPBrowser InfoBarTunerState KiddyTimer LetterBox LogoManager MediaDownloader SPDyn MovieTagger MultiRC NameZap PermanentClock ReconstructApSc remoteTimer DVDBackup FanControl2 Series2Folder SeriesPlugin ShowClock WeatherComponentHandler WerbeZapper ZapHistoryBrowser ZapStatistic WebInterface WebAdmin WebBouquetEditor UShare; do
+          for repo in 3GModemManager ABMCustomMixImporter AboutBoxBranding AnimationSetup AudioEffect autoBLchanger Blindscan BTDevicesManager ChannelsImporter Chefkoch CleverTanken DLNABrowser DLNAServer EPGTranslator Fempa HbbTV LCD4linux LottoExtended PiconManager PiconsUpdater RemoteChannelStreamConverter SatipClient SimpleFancontrol StreamTV TempFanControl tmdb TunerServer TVSpielfilm VentonFancontrol WebkitHbbTV WirelessAccessPoint witaispeechtotext xmlUpdate ardmediathek bitrateviewer AutoTimer BirthdayReminder BMediaCenter EPGRefresh EPGSearch FritzCall IMDb Netzkino Schiffe SHOUTcast SimpleRSS SRFMediathek Sudoku Tetris vierg WeatherPlugin ZDFMediathek AudioSync AutomaticCleanup AutomaticTimerlistCleanup AutoResolution BabelZapper CDInfo EPGBackup EPGExport eSame MPHelp Toolkit AspectRatioSwitch Partnerbox AudioRestart MovieCut fstabEditor FTPBrowser InfoBarTunerState KiddyTimer LetterBox LogoManager MediaDownloader SPDyn MovieTagger MultiRC NameZap PermanentClock ReconstructApSc remoteTimer DVDBackup FanControl2 Series2Folder SeriesPlugin ShowClock WeatherComponentHandler WerbeZapper ZapHistoryBrowser ZapStatistic WebInterface WebAdmin WebBouquetEditor UShare; do
             echo "Cloning $repo..."
             git clone --depth 1 https://github.com/oe-alliance-plugins/$repo.git
             cd $repo/src
@@ -113,9 +113,11 @@ jobs:
             exit 1
           fi
 
-      - name: Upload Screenshot
+      - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: enigma2-screenshot
-          path: screenshot.png
+          path: |
+            screenshot.png
+            enigma2.log
