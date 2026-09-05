@@ -51,7 +51,7 @@ jobs:
 
           cd /tmp
 
-          for repo in 3GModemManager ABMCustomMixImporter AboutBoxBranding AnimationSetup AudioEffect autoBLchanger Blindscan BTDevicesManager ChannelsImporter Chefkoch CleverTanken DLNABrowser DLNAServer EPGTranslator Fempa HbbTV LCD4linux LottoExtended PiconManager PiconsUpdater RemoteChannelStreamConverter SatipClient SimpleFancontrol StreamTV TempFanControl tmdb TunerServer TVSpielfilm VentonFancontrol WebkitHbbTV WirelessAccessPoint witaispeechtotext xmlUpdate ardmediathek bitrateviewer AutoTimer BirthdayReminder BMediaCenter EPGRefresh EPGSearch FritzCall IMDb Netzkino Schiffe SHOUTcast SimpleRSS SRFMediathek Sudoku Tetris vierg WeatherPlugin ZDFMediathek AudioSync AutomaticCleanup AutomaticTimerlistCleanup AutoResolution BabelZapper CDInfo EPGBackup EPGExport eSame MPHelp Toolkit AspectRatioSwitch Partnerbox AudioRestart MovieCut fstabEditor FTPBrowser InfoBarTunerState KiddyTimer LetterBox LogoManager MediaDownloader SPDyn MovieTagger MultiRC NameZap PermanentClock ReconstructApSc remoteTimer DVDBackup FanControl2 Series2Folder SeriesPlugin ShowClock WeatherComponentHandler WerbeZapper ZapHistoryBrowser ZapStatistic WebInterface WebAdmin WebBouquetEditor UShare; do
+          for repo in 3GModemManager ABMCustomMixImporter AboutBoxBranding AnimationSetup AudioEffect autoBLchanger Blindscan BTDevicesManager ChannelsImporter Chefkoch CleverTanken DLNABrowser DLNAServer EPGTranslator Fempa HbbTV LCD4linux LottoExtended PiconManager PiconsUpdater RemoteChannelStreamConverter SatipClient SimpleFancontrol StreamTV TempFanControl tmdb TunerServer TVSpielfilm VentonFancontrol WirelessAccessPoint witaispeechtotext xmlUpdate ardmediathek bitrateviewer AutoTimer BirthdayReminder BMediaCenter EPGRefresh EPGSearch FritzCall IMDb Netzkino Schiffe SHOUTcast SimpleRSS SRFMediathek Sudoku Tetris vierg WeatherPlugin ZDFMediathek AudioSync AutomaticCleanup AutomaticTimerlistCleanup AutoResolution BabelZapper CDInfo EPGBackup EPGExport eSame MPHelp Toolkit AspectRatioSwitch Partnerbox AudioRestart MovieCut fstabEditor FTPBrowser InfoBarTunerState KiddyTimer LetterBox LogoManager MediaDownloader SPDyn MovieTagger MultiRC NameZap PermanentClock ReconstructApSc remoteTimer DVDBackup FanControl2 Series2Folder SeriesPlugin ShowClock WeatherComponentHandler WerbeZapper ZapHistoryBrowser ZapStatistic WebInterface WebAdmin WebBouquetEditor UShare; do
             echo "Cloning $repo..."
             git clone --depth 1 https://github.com/oe-alliance-plugins/$repo.git
             cd $repo/src
@@ -61,6 +61,12 @@ jobs:
               --install-data=/usr/share/enigma2
             cd ../..
           done
+
+          # WebInterface's setup.py only declares the top-level package and misses
+          # the WebChilds/WebComponents subpackages, breaking WebInterface itself
+          # plus WebAdmin/WebBouquetEditor (ModuleNotFoundError). Copy them in by hand.
+          cp -r /tmp/WebInterface/src/WebInterface/WebChilds /usr/lib/enigma2/python/Plugins/Extensions/WebInterface/
+          cp -r /tmp/WebInterface/src/WebInterface/WebComponents /usr/lib/enigma2/python/Plugins/Extensions/WebInterface/
 
           mkdir -p /usr/lib/enigma2/python/Plugins/Extensions/ScreenshotTour
           cp -r "$GITHUB_WORKSPACE"/Plugins/Extensions/ScreenshotTour/* /usr/lib/enigma2/python/Plugins/Extensions/ScreenshotTour/
