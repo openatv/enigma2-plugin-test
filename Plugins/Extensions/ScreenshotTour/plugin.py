@@ -1,7 +1,6 @@
 from os import makedirs, system
 from os.path import join
 from traceback import print_exc
-from time import sleep
 
 from enigma import eTimer
 
@@ -63,10 +62,16 @@ def buildScreens():
 
 
 def autostart(reason, session=None, **kwargs):
+    global timer
     if reason == 0 and session is not None:
         makedirs(SHOTS_DIR, exist_ok=True)
-        sleep(5)  # wait to close Infobar
-        runTour(session, buildScreens())
+
+        def startTour():
+            runTour(session, buildScreens())
+
+        timer = eTimer()
+        timer.callback.append(startTour)
+        timer.start(5000, True)
 
 
 def runTour(session, remaining):
