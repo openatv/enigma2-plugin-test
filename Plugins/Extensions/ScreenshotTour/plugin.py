@@ -4,11 +4,18 @@ from traceback import print_exc
 
 from enigma import eTimer
 
-from Components.NetworkManager import networkManager
 from Plugins.Plugin import PluginDescriptor
 from Screens.Menu import Menu, findMenu
-from Screens.NetworkSetup import NetworkAdapterSetup
 from Screens.Setup import Setup
+
+try:
+    # Only present since the Components.NetworkManager rewrite (added 2026-08-16).
+    # The test image can be older, so this must not break the whole plugin import.
+    from Components.NetworkManager import networkManager
+    from Screens.NetworkSetup import NetworkAdapterSetup
+except ImportError:
+    networkManager = None
+    NetworkAdapterSetup = None
 
 SHOTS_DIR = "/tmp/shots"
 
@@ -43,9 +50,10 @@ def Plugins(**kwargs):
 
 def buildScreens():
     screens = [(f"setup_{key}", Setup, {"setup": key}) for key in SETUP_KEYS]
-    adapter = next(iter(networkManager.adapters.values()), None)
-    if adapter is not None:
-        screens.append(("setup_networkadapter", NetworkAdapterSetup, {"adapter": adapter}))
+    if networkManager is not None:
+        adapter = next(iter(networkManager.adapters.values()), None)
+        if adapter is not None:
+            screens.append(("setup_networkadapter", NetworkAdapterSetup, {"adapter": adapter}))
     for key in MENU_KEYS:
         menu = findMenu(key)
         if menu is not None:
