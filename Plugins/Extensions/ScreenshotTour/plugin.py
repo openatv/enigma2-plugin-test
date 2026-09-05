@@ -1,6 +1,7 @@
 from os import makedirs, system
 from os.path import join
 from traceback import print_exc
+from time import sleep
 
 from enigma import eTimer
 
@@ -64,6 +65,7 @@ def buildScreens():
 def autostart(reason, session=None, **kwargs):
     if reason == 0 and session is not None:
         makedirs(SHOTS_DIR, exist_ok=True)
+        sleep(5)  # wait to close Infobar
         runTour(session, buildScreens())
 
 
@@ -74,7 +76,7 @@ def runTour(session, remaining):
         return
     name, cls, kwargs = remaining.pop(0)
     try:
-        scr = session.open(cls, **kwargs)
+        scr = session.openWithCallback(lambda *closeArgs: runTour(session, remaining), cls, **kwargs)
     except Exception:
         print(f"[ScreenshotTour] Error: Failed to open screen '{name}'.")
         print_exc()
@@ -83,8 +85,7 @@ def runTour(session, remaining):
 
     def afterRender():
         system(f"import -window root {join(SHOTS_DIR, name)}.png")
-        session.deleteDialog(scr)
-        runTour(session, remaining)
+        scr.close()
 
     timer = eTimer()
     timer.callback.append(afterRender)
