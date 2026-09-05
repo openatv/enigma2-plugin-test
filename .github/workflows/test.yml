@@ -40,6 +40,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Install Screenshot tools
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq imagemagick
+
       - name: Install Plugin
         run: |
           set -e
@@ -57,6 +62,9 @@ jobs:
             cd ../..
           done
 
+          mkdir -p /usr/lib/enigma2/python/Plugins/Extensions/ScreenshotTour
+          cp -r "$GITHUB_WORKSPACE"/Plugins/Extensions/ScreenshotTour/* /usr/lib/enigma2/python/Plugins/Extensions/ScreenshotTour/
+
       - name: Start Xvfb
         run: |
           echo "DISPLAY=:0" >> "$GITHUB_ENV"
@@ -72,25 +80,15 @@ jobs:
           enigma2 > enigma2.log 2>&1 &
           echo $! > enigma2.pid
 
-          sleep 30
-
-      - name: Send MENU Keypress
-        run: |
-          # Close any startup popup first so it doesn't swallow the menu key.
-          xdotool key Escape
-          sleep 2
-
-          # SDL translates the X11 "Menu" keysym to SDLK_APPLICATION, which
-          # Enigma2's rcsdl.cpp does not handle. KEY_SPACE also triggers the
-          # menu action (see data/keymap.xml) and maps cleanly via SDLK_SPACE.
-          xdotool key space
-          sleep 2
-
-      - name: Take Screenshot
-        run: |
-          apt-get update -qq
-          apt-get install -y -qq imagemagick
-          import -window root screenshot.png
+          sleep 5
+          echo "Waiting for screenshot tour to finish..."
+          for _ in $(seq 1 60); do
+            if [ -f /tmp/screenshot_tour_done ]; then
+              echo "Screenshot tour finished"
+              break
+            fi
+            sleep 1
+          done
 
       - name: Stop Enigma2
         if: always()
@@ -126,5 +124,5 @@ jobs:
         with:
           name: enigma2-screenshot
           path: |
-            screenshot.png
+            /tmp/shots/*.png
             enigma2.log
